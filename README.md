@@ -1,7 +1,19 @@
 # whats_app_archive
 
-
-
+### Архитектура проекта
+project/
+│
+├── for_test/
+│   ├── new_chat_1.zip
+│   ├── RENAME_WhatsApp_1.zip
+│   └── WhatsApp_1.zip
+├── templates/
+│   ├── index.html
+│   ├── chat.html
+│   └── chats.html
+├── uploads/
+├── app.py
+└── chatParse.py
 
 Чтобы скачать проект с GitHub и запустить его, вам понадобится выполнить несколько шагов:
 
