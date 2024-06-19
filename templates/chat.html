@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+    <div class="container mt-5">
+        <h1 class="text-center">Чат - {{ current_folder }}</h1>
+    {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-info mt-3">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <ul class="list-group">
+            {% for message in messages %}
+                <li class="list-group-item">
+                    <p><strong>{{ message.timestamp }} - {{ message.sender }}</strong></p>
+                    <p>{{ message.content }}</p>
+                    <form method="post" action="{{ url_for('view_chat', folder=current_folder) }}" class="text-right">
+                        <input type="hidden" name="message_id" value="{{ message.id }}">
+                        <button type="submit" class="btn btn-danger btn-sm">Удалить сообщение</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="text-center mt-3">
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Назад к списку чатов</a>
+        </div>
+    </div>
+
+{% endblock %}
