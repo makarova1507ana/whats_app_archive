@@ -4,17 +4,22 @@
   ```bash
 project/
 │
-├── for_test/
-│   ├── new_chat_1.zip
-│   ├── RENAME_WhatsApp_1.zip
-│   └── WhatsApp_1.zip
-├── templates/
-│   ├── index.html
-│   ├── chat.html
-│   └── chats.html
-├── uploads/
-├── app.py
-└── chatParse.py
+├── for_test/                  # Папка с тестовыми архивами чатов WhatsApp
+│   ├── new_chat_1.zip         # Пример архива чата WhatsApp
+│   ├── RENAME_WhatsApp_1.zip  # Пример архива чата WhatsApp
+│   └── WhatsApp_1.zip         # Пример архива чата WhatsApp
+│
+├── templates/                 # Папка с HTML-шаблонами для Flask-приложения
+│   ├── index.html             # Шаблон для главной страницы
+│   ├── chat.html              # Шаблон для страницы просмотра чата
+│   └── chats.html             # Шаблон для страницы со списком чатов
+│
+├── uploads/                   # Папка, куда загружаются и распаковываются архивы
+│
+├── app.py                     # Основной файл Flask-приложения
+│
+└── chatParse.py               # Скрипт для парсинга архива чатов WhatsApp
+
   ```
 
 Чтобы скачать проект с GitHub и запустить его, вам понадобится выполнить несколько шагов:
