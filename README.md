@@ -1,6 +1,7 @@
 # whats_app_archive
 
 ### Архитектура проекта
+  ```bash
 project/
 │
 ├── for_test/
@@ -14,6 +15,7 @@ project/
 ├── uploads/
 ├── app.py
 └── chatParse.py
+  ```
 
 Чтобы скачать проект с GitHub и запустить его, вам понадобится выполнить несколько шагов:
 
