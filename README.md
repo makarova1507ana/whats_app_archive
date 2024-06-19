@@ -23,7 +23,13 @@ project/
   ```
 
 пример приложения:
+- главная страница
 ![image](https://github.com/makarova1507ana/whats_app_archive/assets/103330304/5282b30e-ca46-417c-9e94-50c182b1080c)
+
+- страница чата с сообщениями
+![image](https://github.com/makarova1507ana/whats_app_archive/assets/103330304/a918f7a7-5c32-4499-a11d-6ba9456a39aa)
+
+
 
 Чтобы скачать проект с GitHub и запустить его, вам понадобится выполнить несколько шагов:
 
