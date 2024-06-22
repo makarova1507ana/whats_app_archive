@@ -1,34 +1,107 @@
 {% extends "base.html" %}
+
 {% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Чат: {{ chat.name }}</h1>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Все чаты</a>
+    <ul class="list-unstyled">
+        {% set all_messages = chat.messages + chat.media_files %}
+        {% set sorted_messages = all_messages | sort(attribute='timestamp') %}
+        {% for item in sorted_messages %}
+            {% if not item.deleted %} {# Check if message is not deleted #}
+                <li class="mb-3">
+                    {% if item.sender == 'Anastasiia' %}
+                        <div class="message-container right">
+                            <div class="message-content right-content">
+                                <strong>{{ item.sender }}</strong>:
+                                {% if item.content %}
+                                    {{ item.content }}
+                                {% else %}
+                                    <a href="{{ url_for('media_file', filename=item.filename) }}" target="_blank">
+                                        <img src="{{ url_for('media_file', filename=item.filename) }}" alt="{{ item.filename }}" class="img-thumbnail" style="max-width: 100px; border: 1px solid #ccc;">
+                                    </a>
+                                {% endif %}
+                                <br>
+                                <small>{{ item.timestamp }}</small>
+                                {% if not item.deleted %}
+                                <div class="delete-icon">
+                                    <form method="POST" class="delete-form" action="{{ url_for('view_chat', chat_id=item.chat_id) }}">
+                                        <input type="hidden" name="message_id" value="{{ item.id }}">
+                                        <button type="submit" class="btn btn-link delete-btn" style="padding: 0; font-size: 1.5rem;" title="Удалить">🗑️</button>
+                                    </form>
+                                </div>
+
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="message-container">
+                            <div class="message-content">
+                                <strong>{{ item.sender }}</strong>:
+                                {% if item.content %}
+                                    {{ item.content }}
+                                {% else %}
+                                    <a href="{{ url_for('media_file', filename=item.filename) }}" target="_blank">
+                                        <img src="{{ url_for('media_file', filename=item.filename) }}" alt="{{ item.filename }}" class="img-thumbnail" style="max-width: 100px; border: 1px solid #ccc;">
+                                    </a>
+                                {% endif %}
+                                <br>
+                                <small>{{ item.timestamp }}</small>
+                                {% if item.sender != 'Anastasiia' %}
+                                <div class="delete-icon">
+                                    <form method="POST" class="delete-form" action="{{ url_for('view_chat', chat_id=item.chat_id) }}">
+
+                                        <input type="hidden" name="message_id" value="{{ item.id }}">
+                                        <button type="submit" class="btn btn-link delete-btn" style="padding: 0; font-size: 1.5rem;" title="Удалить">🗑️</button>
+                                    </form>
 
 
-    <div class="container mt-5">
-        <h1 class="text-center">Чат - {{ current_folder }}</h1>
-    {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <div class="alert alert-info mt-3">
-                    {% for message in messages %}
-                        <p>{{ message }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-        <ul class="list-group">
-            {% for message in messages %}
-                <li class="list-group-item">
-                    <p><strong>{{ message.timestamp }} - {{ message.sender }}</strong></p>
-                    <p>{{ message.content }}</p>
-                    <form method="post" action="{{ url_for('view_chat', folder=current_folder) }}" class="text-right">
-                        <input type="hidden" name="message_id" value="{{ message.id }}">
-                        <button type="submit" class="btn btn-danger btn-sm">Удалить сообщение</button>
-                    </form>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
                 </li>
-            {% endfor %}
-        </ul>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
 
-        <div class="text-center mt-3">
-            <a href="{{ url_for('index') }}" class="btn btn-secondary">Назад к списку чатов</a>
-        </div>
-    </div>
-
+<style>
+    .message-container {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        position: relative;
+    }
+    .message-content {
+        background-color: #f0f0f0;
+        padding: 10px;
+        border-radius: 8px;
+        max-width: 70%;
+        position: relative;
+    }
+    .right {
+        justify-content: flex-end;
+    }
+    .right-content {
+        background-color: #dcf8c6;
+        padding: 10px;
+        border-radius: 8px;
+        max-width: 70%;
+        position: relative; /* Ensure it's relative to allow absolute positioning of child elements */
+    }
+    .delete-icon {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+    }
+    .delete-btn {
+        color: inherit;
+    }
+    .delete-btn:hover {
+        color: red;
+    }
+</style>
 {% endblock %}

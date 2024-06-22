@@ -1,25 +1,32 @@
+from getData  import  *
 
-
-import os
-from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
-from werkzeug.utils import secure_filename
-
-from parseChat import *
-
-app = Flask(__name__)
-app.secret_key = 'ваш_секретный_ключ'
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+ALLOWED_EXTENSIONS = {'zip'}
+UPLOAD_FOLDER = 'uploads'
 
 
 
 
 
 
-# Маршрут главной страницы приложения
+
+# Создание контекста приложения и базы данных
+with app.app_context():
+    db.create_all()
+    print("Database created or already exists.")
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    folders = list_chat_folders()
+    """
+    Основной маршрут для отображения главной страницы приложения.
+
+    Поддерживает методы GET и POST. При POST запросе загружает ZIP-архив,
+    извлекает из него сообщения и медиафайлы, сохраняет их в базу данных.
+
+    Возвращает:
+    str: HTML-страницу с отображением чатов и формой для загрузки файлов.
+    """
+    chats = Chat.query.all()
 
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -37,64 +44,62 @@ def index():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
-            extract_folder = os.path.join(app.config['UPLOAD_FOLDER'], os.path.splitext(filename)[0])
-
-            if not os.path.exists(extract_folder):
-                os.makedirs(extract_folder)
-
-            existing_messages = load_messages(extract_folder)
-
-            new_messages = extract_messages_from_archive(filepath, extract_folder)
-
-            combined_messages = []
-            existing_contents = {msg['content']: msg for msg in existing_messages}
+            new_messages = extract_messages_from_archive(filepath)
 
             for msg in new_messages:
-                if msg['content'] in existing_contents:
-                    existing_msg = existing_contents[msg['content']]
-                    msg['deleted'] = existing_msg['deleted']
-                combined_messages.append(msg)
+                db.session.add(msg)
 
-            save_messages(extract_folder, combined_messages)
+            db.session.commit()
 
             flash('Файл успешно загружен и обработан')
             return redirect(url_for('index'))
 
-    return render_template('index.html', folders=folders)
+    return render_template('index.html', chats=chats)
 
-# Маршрут просмотра сообщений в чате
-@app.route('/chat/<folder>', methods=['GET', 'POST'])
-def view_chat(folder):
-    messages = load_messages(os.path.join(app.config['UPLOAD_FOLDER'], folder))
+@app.route('/chat/<int:chat_id>', methods=['GET', 'POST'])
+def view_chat(chat_id):
+    """
+    Маршрут для просмотра сообщений конкретного чата.
+
+    Аргументы:
+    chat_id (int): Идентификатор чата.
+
+    Поддерживает методы GET и POST. При POST запросе удаляет выбранное сообщение.
+
+    Возвращает:
+    str: HTML-страницу с сообщениями чата и формой для удаления сообщений.
+    """
+    chat = Chat.query.get_or_404(chat_id)
+    messages = Message.query.filter_by(chat_id=chat.id, deleted=False).all()
+    media_files = Media.query.filter_by(chat_id=chat.id).all()
 
     if request.method == 'POST':
         message_id = request.form.get('message_id')
         if message_id:
-            for message in messages:
-                if message['id'] == int(message_id):
-                    message['deleted'] = True
-            save_messages(os.path.join(app.config['UPLOAD_FOLDER'], folder), messages)
-            flash(f'Сообщение {message_id} удалено')
-            return redirect(url_for('view_chat', folder=folder))
+            message = Message.query.get(message_id)
+            if message:
+                message.deleted = True
+                db.session.commit()
+                flash(f'Сообщение {message_id} удалено')
+                return redirect(url_for('view_chat', chat_id=chat.id))
 
-    filtered_messages = [msg for msg in messages if not msg['deleted']]
+    return render_template('chat.html', chat=chat, messages=messages, media_files=media_files)
 
-    return render_template('chat.html', current_folder=folder, messages=filtered_messages)
+@app.route('/media/<path:filename>')
+def media_file(filename):
+    """
+    Маршрут для отображения медиафайлов.
 
-# Функция для получения списка папок чатов
-def list_chat_folders():
-    folders = []
-    for root, dirs, files in os.walk(app.config['UPLOAD_FOLDER']):
-        for dir in dirs:
-            if os.path.exists(os.path.join(root, dir, 'messages.json')):
-                folders.append(dir)
-    return folders
+    Аргументы:
+    filename (str): Имя медиафайла.
 
-# Маршрут для обслуживания загруженных файлов
-@app.route('/uploads/<folder>/<filename>')
-def uploaded_file(folder, filename):
-    return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], folder), filename)
+    Возвращает:
+    str: Медиафайл для отображения или скачивания.
+    """
+    return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], "media"), filename)
 
 # Запуск приложения
 if __name__ == '__main__':
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
     app.run(debug=True)
