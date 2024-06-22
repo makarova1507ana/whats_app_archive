@@ -5,29 +5,34 @@
 project/
 │
 ├── for_test/                  # Папка с тестовыми архивами чатов WhatsApp
-│   ├── new_chat_1.zip         # Пример архива чата WhatsApp
-│   ├── RENAME_WhatsApp_1.zip  # Пример архива чата WhatsApp
+│   ├── new_message_WhatsApp_1.zip # Пример архива чата WhatsApp
 │   └── WhatsApp_1.zip         # Пример архива чата WhatsApp
 │
+├── instance/
+│   ├── messages.db            # реляционная база данных 
 ├── templates/                 # Папка с HTML-шаблонами для Flask-приложения
 │   ├── index.html             # Шаблон для главной страницы
 │   ├── chat.html              # Шаблон для страницы просмотра чата
-│   └── chats.html             # Шаблон для страницы со списком чатов
+│   └── base.html              # базовый шаблон
 │
 ├── uploads/                   # Папка, куда загружаются и распаковываются архивы
 │
 ├── app.py                     # Основной файл Flask-приложения
 │
-└── chatParse.py               # Скрипт для парсинга архива чатов WhatsApp
+├── models.py                  # код для работы с БД
+│
+└── getData.py                 # Скрипт для парсинга архива чатов WhatsApp
 
   ```
 
 пример приложения:
 - главная страница
-![image](https://github.com/makarova1507ana/whats_app_archive/assets/103330304/5282b30e-ca46-417c-9e94-50c182b1080c)
+- ![image](https://github.com/makarova1507ana/whats_app_archive/assets/103330304/979ce433-3552-4079-b5e3-6cf4db774406)
+
 
 - страница чата с сообщениями
-![image](https://github.com/makarova1507ana/whats_app_archive/assets/103330304/a918f7a7-5c32-4499-a11d-6ba9456a39aa)
+![image](https://github.com/makarova1507ana/whats_app_archive/assets/103330304/69d1ecf0-8c5f-41a8-8c6a-02c80c4d6679)
+
 
 
 
